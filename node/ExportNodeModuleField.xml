@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<meta-runner name="Export Node Module Field">
+  <description>Exports a field from the module’s package.json as a build parameter.</description>
+  <settings>
+    <parameters>
+      <param name="system.node.module.field.name" value="" spec="text description='Field name as appears in package.json' display='normal' label='Field Name:' validationMode='not_empty'" />
+      <param name="system.node.module.param.name" value="" spec="text description='A name for the exported parameter.' display='normal' label='Parameter Name:' validationMode='not_empty'" />
+    </parameters>
+    <build-runners>
+      <runner name="Export Node Module Field" type="jonnyzzz.node">
+        <parameters>
+          <param name="node_execution_mode" value="script" />
+          <param name="node_script_args" value="%system.node.module.field.name% %system.node.module.param.name%" />
+          <param name="node_script_text"><![CDATA[/**/
+
+var packageJson;
+try {
+	packageJson = require('./package.json');
+} catch (ex) {
+	console.log("##teamcity[message text='no package.json found' status='ERROR']");
+	process.exit(1);
+}
+
+var fieldName = process.argv[2];
+var paramName = process.argv[3];
+var fieldValue = packageJson[fieldName];
+
+// show in build log
+console.log("##teamcity[message text='name: " + paramName + ", value: " + fieldValue + "']");
+
+// export parameter
+console.log("##teamcity[setParameter name='" + paramName + "' value='" + fieldValue + "']");
+
+   /**/]]></param>
+          <param name="teamcity.step.mode" value="default" />
+        </parameters>
+      </runner>
+    </build-runners>
+    <requirements />
+  </settings>
+</meta-runner>
+
