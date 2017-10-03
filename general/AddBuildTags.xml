@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<build-type>
+  <name>Add Build Tags</name>
+  <description />
+  <settings>
+    <parameters>
+      <param name="system.tags" value="" spec="text description='Space separated tags for build' display='normal' label='Tags:' validationMode='not_empty'" />
+    </parameters>
+    <build-runners>
+      <runner name="Add Build Tags" type="Ant">
+        <parameters>
+          <param name="build-file"><![CDATA[<project name="Add build tags">
+  
+              <taskdef name="http" classname="org.missinglink.ant.task.http.HttpClientTask" />
+
+              <property name="tags.file" location="${teamcity.build.tempDir}/tags.txt" />
+              <property name="reqParams.file" location="${teamcity.build.tempDir}/rawParams.txt" />
+
+              <target name="prepare-params">
+
+                <echo file="${tags.file}">${tags}</echo>
+
+                <replaceregexp file="${tags.file}"
+                            match="&amp;amp;"
+                            replace="&amp;amp;amp;"
+                            flags="gm"
+                />
+
+                <replaceregexp file="${tags.file}"
+                            match="&amp;lt;"
+                            replace="&amp;amp;lt;"
+                            flags="gm"
+                />
+
+                <replaceregexp file="${tags.file}"
+                            match="^\s+"
+                            replace=""
+                            flags="gm"
+                />
+
+                <replaceregexp file="${tags.file}"
+                            match="\s+$"
+                            replace=""
+                            flags="gm"
+                />
+
+                <replaceregexp file="${tags.file}"
+                            match="(\s+)"
+                            replace="&amp;lt;/tag&gt;&amp;lt;tag&gt;"
+                            flags="gm"
+                />
+
+
+                <loadfile srcFile="${tags.file}" property="prepared.tags" />
+
+                <echo file="${reqParams.file}">${prepared.tags}</echo>
+
+              </target>
+
+              <target name="addTags" depends="prepare-params">
+                <http url="%teamcity.serverUrl%/httpAuth/app/rest/8.0/builds/id:%teamcity.build.id%/tags"
+                method="POST"
+                expected="200"
+                printrequest="true">
+                  <headers>
+                    <header name="Content-Type" value="text/plain" />
+                  </headers>
+                  <credentials username="${teamcity.auth.userId}" password="${teamcity.auth.password}" />
+                  <entity file="${reqParams.file}" binary="false" />
+                </http>
+              </target>
+
+            </project>]]></param>
+          <param name="build-file-path" value="build.xml" />
+          <param name="target" value="addTags" />
+          <param name="runnerArgs" value="-lib %teamcity.tool.ant-net-tasks%" />
+          <param name="teamcity.coverage.emma.include.source" value="true" />
+          <param name="teamcity.coverage.emma.instr.parameters" value="-ix -*Test*" />
+          <param name="teamcity.coverage.idea.includePatterns" value="*" />
+          <param name="teamcity.step.mode" value="default" />
+          <param name="use-custom-build-file" value="true" />
+        </parameters>
+      </runner>
+    </build-runners>
+    <vcs-settings checkout-mode="ON_SERVER" labeling-type="NONE" labeling-pattern="build-%system.build.number%" />
+    <requirements />
+    <build-triggers />
+    <cleanup />
+  </settings>
+</build-type>
