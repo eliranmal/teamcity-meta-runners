@@ -1,0 +1,30 @@
+
+# OS
+
+## mac os
+*.DS_Store
+.AppleDouble
+.LSOverride
+
+### Icon must end with two \r
+Icon
+
+
+### thumbnails
+._*
+
+
+# IDE
+
+## intellij
+.idea
+*.iws
+out/
+*.iml
+
+## vscode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
