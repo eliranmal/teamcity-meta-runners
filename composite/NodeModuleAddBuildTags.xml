@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<meta-runner name="Node Module - Add Build Tags">
+  <description>Add build tags for node module projects.</description>
+  <settings>
+    <parameters>
+      <param name="system.build.type" value="%build.type%" spec="text validationMode='not_empty' display='hidden'" />
+    </parameters>
+    <build-runners>
+      <runner name="Export Node Module Version" type="ExportNodeModuleField">
+        <parameters>
+          <param name="system.node.module.field.name" value="version" />
+          <param name="system.node.module.param.name" value="node.module.version" />
+          <param name="teamcity.step.mode" value="default" />
+        </parameters>
+      </runner>
+      <runner name="Add Node Module Build Tags" type="AddBuildTags">
+        <parameters>
+          <param name="system.tags" value="%node.module.version%.%build.number%-%build.type%" />
+          <param name="teamcity.step.mode" value="default" />
+        </parameters>
+      </runner>
+    </build-runners>
+    <requirements />
+  </settings>
+</meta-runner>
